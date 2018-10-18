@@ -25,14 +25,17 @@ pipeline {
         }
         stage('Upload draftset') {
             steps {
-                uploadTidy(['out/tidy.csv'],
-                           'https://github.com/ONS-OpenData/ref_migration/raw/master/columns.csv')
+                script {
+                    jobDraft.replace()
+                    uploadTidy(['out/tidy.csv'],
+                               'https://github.com/ONS-OpenData/ref_migration/raw/master/columns.csv')
+                }
             }
         }
         stage('Publish') {
             steps {
                 script {
-                    publishDraftset()
+                    jobDraft.publish()
                 }
             }
         }
