@@ -1,0 +1,54 @@
+{
+  "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
+  "tables": [
+    {
+      "url": "https://ons-opendata.github.io/ref_migration/codelists/migration-directions.csv",
+      "tableSchema": "https://ons-opendata.github.io/ref_migration/codelist-schema.json"
+    }, {
+      "url": "out/tidy.csv",
+      "tableSchema": {
+        "columns": [{
+          "titles": "Area of Destination or Origin",
+          "name": "area_destination_origin",
+          "required": true
+        }, {
+          "titles": "Period",
+          "name": "period",
+          "required": true
+        }, {
+          "titles": "Sex",
+          "name": "sex",
+          "required": true
+        }, {
+          "titles": "Flow",
+          "name": "flow",
+          "required": true
+        }, {
+          "titles": "Measure Type",
+          "name": "measure_type",
+          "datatype": {
+            "format": "Count"
+          }
+        }, {
+          "titles": "Value",
+          "name": "value",
+          "datatype": {
+            "format": "^(-|)([0-9]|[1-9][0-9]+)$"
+          },
+          "required": true
+        }, {
+          "titles": "Unit",
+          "name": "unit",
+          "datatype": {
+            "base": "string",
+            "format": "People"
+          },
+          "required": true
+        }],
+        "primaryKey": [
+          "area_destination_origin", "period", "sex", "flow", "measure_type", "value", "unit"
+        ]
+      }
+    }
+  ]
+}
