@@ -32,7 +32,9 @@ pipeline {
             }
             steps {
                 script {
-                    sh "csvlint -s schema.json"
+                    ansiColor('xterm') {
+                        sh "csvlint -s schema.json"
+                    }
                 }
             }
         }
@@ -55,7 +57,11 @@ pipeline {
     }
     post {
         always {
-            archiveArtifacts 'out/*'
+            script {
+                archiveArtifacts 'out/*'
+                updateCard "5b476b6f2b80a37d25b7e67a"
+                updateCard "5b475664424cd067e0c28ee4"
+            }
         }
         success {
             build job: '../GDP-tests', wait: false
