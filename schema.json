@@ -5,6 +5,12 @@
       "url": "https://ons-opendata.github.io/ref_migration/codelists/migration-directions.csv",
       "tableSchema": "https://ons-opendata.github.io/ref_migration/codelist-schema.json"
     }, {
+      "url": "https://ons-opendata.github.io/ref_common/codelists/age-groups.csv",
+      "tableSchema": "https://ons-opendata.github.io/ref_common/codelist-schema.json"
+    }, {
+      "url": "https://ons-opendata.github.io/ref_common/codelists/measurement-units.csv",
+      "tableSchema": "https://ons-opendata.github.io/ref_common/codelist-schema.json"
+    }, {
       "url": "out/tidy.csv",
       "tableSchema": {
         "columns": [{
@@ -18,6 +24,10 @@
         }, {
           "titles": "Sex",
           "name": "sex",
+          "required": true
+        }, {
+          "titles": "Age",
+          "name": "age",
           "required": true
         }, {
           "titles": "Flow",
@@ -45,8 +55,27 @@
           },
           "required": true
         }],
+        "foreignKeys": [{
+          "columnReference": "flow",
+          "reference": {
+            "resource": "https://ons-opendata.github.io/ref_migration/codelists/migration-directions.csv",
+            "columnReference": "label"
+          }
+        }, {
+          "columnReference": "age",
+          "reference": {
+            "resource": "https://ons-opendata.github.io/ref_common/codelists/age-groups.csv",
+            "columnReference": "notation"
+          }
+        }, {
+          "columnReference": "unit",
+          "reference": {
+            "resource": "https://ons-opendata.github.io/ref_common/codelists/measurement-units.csv",
+            "columnReference": "label"
+          }
+        }],
         "primaryKey": [
-          "area_destination_origin", "period", "sex", "flow", "measure_type", "unit"
+          "area_destination_origin", "period", "sex", "age", "flow", "measure_type", "unit"
         ]
       }
     }
