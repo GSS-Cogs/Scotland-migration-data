@@ -59,7 +59,7 @@
           "columnReference": "flow",
           "reference": {
             "resource": "https://ons-opendata.github.io/ref_migration/codelists/migration-directions.csv",
-            "columnReference": "label"
+            "columnReference": "notation"
           }
         }, {
           "columnReference": "age",
