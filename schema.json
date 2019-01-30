@@ -2,10 +2,13 @@
   "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
   "tables": [
     {
-      "url": "https://ons-opendata.github.io/ref_migration/codelists/migration-directions.csv",
+      "url": "https://ons-opendata.github.io/ref_migration/codelists/foreign-geography.csv",
       "tableSchema": "https://ons-opendata.github.io/ref_migration/codelist-schema.json"
     }, {
       "url": "https://ons-opendata.github.io/ref_common/codelists/age-groups.csv",
+      "tableSchema": "https://ons-opendata.github.io/ref_common/codelist-schema.json"
+    }, {
+      "url": "https://ons-opendata.github.io/ref_migration/codelists/migration-directions.csv",
       "tableSchema": "https://ons-opendata.github.io/ref_common/codelist-schema.json"
     }, {
       "url": "https://ons-opendata.github.io/ref_common/codelists/measurement-units.csv",
@@ -14,16 +17,29 @@
       "url": "out/tidy.csv",
       "tableSchema": {
         "columns": [{
-          "titles": "Area of Destination or Origin",
-          "name": "area_destination_origin",
+          "titles": "Domestic geography",
+          "name": "domestic_geography",
+          "datatype": {
+            "format": "S[0-9]{8}"
+          },
+          "required": true
+        }, {
+          "titles": "Foreign geography",
+          "name": "foreign_geography",
           "required": true
         }, {
           "titles": "Mid Year",
           "name": "period",
+          "datatype": {
+            "format": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T00:00:00/P1Y$"
+          },
           "required": true
         }, {
           "titles": "Sex",
           "name": "sex",
+          "datatype": {
+            "format": "^M$|^F$|^T$"
+          },
           "required": true
         }, {
           "titles": "Age",
@@ -37,7 +53,7 @@
           "titles": "Measure Type",
           "name": "measure_type",
           "datatype": {
-            "format": "Count"
+            "format": "^Count$"
           }
         }, {
           "titles": "Value",
@@ -51,11 +67,17 @@
           "name": "unit",
           "datatype": {
             "base": "string",
-            "format": "People"
+            "format": "^People$"
           },
           "required": true
         }],
         "foreignKeys": [{
+          "columnReference": "foreign_geography",
+          "reference": {
+            "resource": "https://ons-opendata.github.io/ref_migration/codelists/foreign-geography.csv",
+            "columnReference": "notation"
+          }
+        }, {
           "columnReference": "flow",
           "reference": {
             "resource": "https://ons-opendata.github.io/ref_migration/codelists/migration-directions.csv",
@@ -75,7 +97,7 @@
           }
         }],
         "primaryKey": [
-          "area_destination_origin", "period", "sex", "age", "flow", "measure_type", "unit"
+          "domestic_geography", "foreign_geography", "period", "sex", "age", "flow", "measure_type", "unit"
         ]
       }
     }
