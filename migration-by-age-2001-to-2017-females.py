@@ -34,7 +34,7 @@ if is_interactive():
 Final_table = pd.DataFrame()
 
 # +
-tab = [t for t in tabs if t.name == 'SYOA Feales (2001-)'][0]
+tab = [t for t in tabs if t.name == 'SYOA Females (2001-)'][0]
 cell = tab.filter('Year')
 age = cell.fill(RIGHT).is_not_blank().is_not_whitespace() | cell.shift(0,1).fill(RIGHT).is_not_blank().is_not_whitespace()
 year = cell.shift(0,1).expand(DOWN).is_not_blank().is_not_whitespace()
