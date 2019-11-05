@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.4'
-#       jupytext_version: 1.1.1
+#       jupytext_version: 1.2.4
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -80,4 +80,4 @@ Final_table['Foreign geography'] = 'nrs/overseas'
 
 Final_table = Final_table[['Domestic geography','Foreign geography','Mid Year','Sex','Age','Flow','Measure Type','Value','Unit']]
 
-Final_table
+Final_table["source"] = "migration-by-age-2001-to-2017-males"

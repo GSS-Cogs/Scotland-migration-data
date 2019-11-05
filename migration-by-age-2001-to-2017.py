@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.4'
-#       jupytext_version: 1.1.1
+#       jupytext_version: 1.2.4
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -30,7 +30,7 @@ if is_interactive():
     display(distribution)
     tabs = [tab for tab in distribution.as_databaker() if tab.name.startswith('AG ')]
     display([tab.name for tab in tabs])
-    
+
 
 # + {"jupyter": {"outputs_hidden": true}}
 Final_table = pd.DataFrame()
@@ -93,4 +93,4 @@ Final_table['Foreign geography'] = Final_table['Foreign geography'].map(
         }.get(x, x))
 # -
 
-Final_table
+Final_table["source"] = "migration-by-age-2001-to-2017"

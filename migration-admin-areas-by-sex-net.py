@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.4'
-#       jupytext_version: 1.1.1
+#       jupytext_version: 1.2.4
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -83,4 +83,4 @@ tidy = tidy[['Domestic geography','Foreign geography','Mid Year','Sex','Age', 'F
 tidy
 
 # + {"jupyter": {"outputs_hidden": true}}
-
+tidy["source"] = "migration-admin-areas-by-sex-net"
