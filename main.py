@@ -171,49 +171,25 @@ for combination in duplicated_combinations:
     # Compare precision of the last two digits    
     both_values = list(temp_df["Value"].unique())
     
-    # First we need to make sure we're picking between comprable numbers
-    # Comparing the earlier digits is a bit tricky as the precision varies depending
-    # on the size of the number (i.e you dont round 200 to closest 5 digit figure)
-    # The pattern seems to be 2 digits rounding for 3 figures, and 3 digit rounding for higher
-    if both_values[0] < 1000 and both_values[1] < 1000:
-        compare_without_last = 2
-    else:
-        compare_without_last = 3
-    
-    if str(both_values[0])[:-compare_without_last] != str(both_values[1])[:-compare_without_last]:
-        
-        # Anything less than 100 gets rounded to 100.....
-        if 100 in both_values and both_values[0] < 100 or both_values[1] < 100:
-            pass # it's fine
-        else:
-            raise ValueError("Aborting. We have duplicate numbers that appear to be differentiated by "
-                        "more than just rounding off, these: {}".format(",".join([str(x) for x in both_values])))
-        
-    # Now we compare precision and drop the least precise
-    both_values = list(temp_df["Value"].unique())
-    
-    decided = False
-    # Consider the last two digits
-    for i in [-1, -2]:
-
-        # if we've rounded the first number take the second
-        if str(both_values[0])[i] == "0" and str(both_values[1])[i] != "0":
-            chosen_value = both_values[1]
-            decided = True
-            break
-
-        # if we've round the second, take the first
-        elif str(both_values[1])[i] == "0" and str(both_values[0])[i] != "0":
+    # We're rounding to 1, 3 or 3 dignificant bits
+    found = False
+    for i in range(1, 3):
+        if float(round(both_values[0], -i)) == float(both_values[1]):
             chosen_value = both_values[0]
-            decided = True
+            found = True
             break
             
-    if not decided:
-        # If the difference isn't obvious to our current logic, we need to blow up
-        raise ValueError("Aborting, unable to ascertain which value has been rounded from {}." \
-                        .format(",".join([str(x) for x in both_values])))
+        if float(round(both_values[1], -i)) == float(both_values[0]):
+            chosen_value = both_values[1]
+            found = True
+            break
+            
+    if not found:
+        raise ValueError("Aborting. We have duplicate numbers that appear to be differentiated by "
+                    "more than just the significant numbers, these: {}".format(",".join([str(x) for x in both_values])))
         
     print(chosen_value, "from", both_values)
+        
     index_to_drop = table[(table["all_dimensions"] == combination) & (table["Value"] != chosen_value)].index.tolist()
     table = table.drop(index=index_to_drop[0])
 
