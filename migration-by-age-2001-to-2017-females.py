@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.4'
-#       jupytext_version: 1.1.1
+#       jupytext_version: 1.2.4
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -28,92 +28,56 @@ if is_interactive():
         mediaType='application/vnd.ms-excel',
         title='Migration between Scotland and overseas by age')
     display(distribution)
-    tab = distribution.as_pandas(sheet_name = 'SYOA Females (2001-)')
+    tabs = distribution.as_databaker()
 # -
-
-tab
 
 Final_table = pd.DataFrame()
 
-observations = tab.iloc[4:21, :93]
-observations.rename(columns= observations.iloc[0], inplace=True)
-observations.drop(observations.index[0])
-observations.columns.values[0] = -1
-observations.columns.values[1] = -2
-observations.drop(observations.index[0], inplace = True)
-new_table = pd.melt(observations, id_vars=[-1], var_name='Age', value_name='Value')
-new_table.Value.dropna(inplace =True)
-new_table['temp'] = new_table[-1].str[0:2]
-new_table = new_table[new_table['temp'] == '20']
-new_table['Age'].fillna('anything', inplace = True)
-new_table['Age'] = new_table['Age'].astype(int)
-new_table['Age'] = new_table['Age'].astype(str)
-new_table = new_table[new_table['Age'] != 'anything' ]
-new_table.columns = ['Mid Year' if x== -1 else x for x in new_table.columns]
-new_table['Unit'] = 'People'
-new_table['Measure Type'] = 'Count'
-new_table['Domestic geography'] = 'Scotland'
-new_table['Sex'] = 'F'
-new_table['Flow'] = 'Inflow'
-new_table['Mid Year'] = new_table['Mid Year'].map(lambda x: str(x)[0:4])
-new_table['Mid Year'] = new_table['Mid Year'] + '-06-30T00:00:00/P1Y'
-new_table['Age'] = new_table['Age'].map(lambda cell: cell.replace('-2', 'all'))
-new_table['Age'] = 'year/' + new_table['Age']
-Final_table = pd.concat([Final_table, new_table])
+# +
+tab = [t for t in tabs if t.name == 'SYOA Feales (2001-)'][0]
+cell = tab.filter('Year')
+age = cell.fill(RIGHT).is_not_blank().is_not_whitespace() | cell.shift(0,1).fill(RIGHT).is_not_blank().is_not_whitespace()
+year = cell.shift(0,1).expand(DOWN).is_not_blank().is_not_whitespace()
+flow = tab.filter(contains_string('migration')).is_not_blank().is_not_whitespace()
+observations = age.fill(DOWN).is_not_blank().is_not_whitespace() 
+observations = observations- cell.shift(0,1).fill(RIGHT) - year - flow
 
-observations = tab.iloc[24:41, :93]
-observations.rename(columns= observations.iloc[0], inplace=True)
-observations.drop(observations.index[0])
-observations.columns.values[0] = -1
-observations.columns.values[1] = -2
-observations.drop(observations.index[0], inplace = True)
-new_table = pd.melt(observations, id_vars=[-1], var_name='Age', value_name='Value')
-new_table.Value.dropna(inplace =True)
-new_table['temp'] = new_table[-1].str[0:2]
-new_table = new_table[new_table['temp'] == '20']
-new_table['Age'].fillna('anything', inplace = True)
-new_table['Age'] = new_table['Age'].astype(int)
+Dimensions = [
+            HDim(year,'Mid Year',CLOSEST, ABOVE),
+            HDim(flow,'Flow',CLOSEST, ABOVE),
+            HDim(age,'Age',DIRECTLY, ABOVE),
+            HDimConst('Measure Type', 'Count'),
+            HDimConst('Unit','People'),
+            HDimConst('Sex','F'),
+            HDimConst('Domestic geography','Scotland')
+    ]
+c1 = ConversionSegment(observations, Dimensions, processTIMEUNIT=True)
+new_table = c1.topandas()
+new_table['Flow'] = new_table['Flow'].map(
+    lambda x: {
+        'In migration of females from overseas 2001-02 to latest' : 'Inflow', 
+        'Out migration of females to overseas 2001-02 to latest' : 'Outflow',
+        'Net migration of females from overseas 2001-02 to latest': 'Balance' 
+        }.get(x, x))
 new_table['Age'] = new_table['Age'].astype(str)
-new_table = new_table[new_table['Age'] != 'anything' ]
-new_table.columns = ['Mid Year' if x== -1 else x for x in new_table.columns]
-new_table['Unit'] = 'People'
-new_table['Measure Type'] = 'Count'
-new_table['Domestic geography'] = 'Scotland'
-new_table['Sex'] = 'F'
-new_table['Flow'] = 'Outflow'
-new_table['Mid Year'] = new_table['Mid Year'].map(lambda x: str(x)[0:4])
-new_table['Mid Year'] = new_table['Mid Year'] + '-06-30T00:00:00/P1Y'
-new_table['Age'] = new_table['Age'].map(lambda cell: cell.replace('-2', 'all'))
+new_table['Age'] = new_table['Age'].map(lambda cell:cell.replace('All ages', 'all'))
 new_table['Age'] = 'year/' + new_table['Age']
-Final_table = pd.concat([Final_table, new_table])
-
-observations = tab.iloc[45:62, :93]
-observations.rename(columns= observations.iloc[0], inplace=True)
-observations.drop(observations.index[0])
-observations.columns.values[0] = -1
-observations.columns.values[1] = -2
-observations.drop(observations.index[0], inplace = True)
-new_table = pd.melt(observations, id_vars=[-1], var_name='Age', value_name='Value')
-new_table.Value.dropna(inplace =True)
-new_table['temp'] = new_table[-1].str[0:2]
-new_table = new_table[new_table['temp'] == '20']
-new_table['Age'].fillna('anything', inplace = True)
-new_table['Age'] = new_table['Age'].astype(int)
-new_table['Age'] = new_table['Age'].astype(str)
-new_table = new_table[new_table['Age'] != 'anything' ]
-new_table.columns = ['Mid Year' if x== -1 else x for x in new_table.columns]
-new_table['Unit'] = 'People'
-new_table['Measure Type'] = 'Count'
-new_table['Domestic geography'] = 'Scotland'
-new_table['Sex'] = 'F'
-new_table['Flow'] = 'Balance'
-new_table['Age'] = new_table['Age'].map(lambda cell: cell.replace('-2', 'all'))
-new_table['Age'] = 'year/' + new_table['Age']
+new_table['Age'] = new_table['Age'].map(lambda cell:cell.replace('.0', ''))
+new_table.dropna(subset=['Mid Year'], inplace=True)
 new_table['Mid Year'] = new_table['Mid Year'].map(lambda x: str(x)[0:4]) + '-06-30T00:00:00/P1Y'
 Final_table = pd.concat([Final_table, new_table])
+# -
+
+import numpy as np
+Final_table['OBS'].replace('', np.nan, inplace=True)
+Final_table.dropna(subset=['OBS'], inplace=True)
+if 'DATAMARKER' in Final_table.columns:
+    Final_table.drop(columns=['DATAMARKER'], inplace=True)
+Final_table.rename(columns={'OBS': 'Value'}, inplace=True)
+Final_table['Value'] = Final_table['Value'].astype(int)
 
 Final_table['Foreign geography'] = 'nrs/overseas'
 
 Final_table = Final_table[['Domestic geography','Foreign geography','Mid Year','Sex','Age','Flow','Measure Type','Value','Unit']]
 
-
+Final_table["source"] = "migration-by-age-2001-to-2017-females"
