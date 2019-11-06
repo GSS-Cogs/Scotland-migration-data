@@ -146,6 +146,8 @@ print("New length:", len(table))
 # +
 initial_table_length = len(table)
 
+import decimal 
+
 # concatenate all dimensions except souce and Value into an "all_dimensions" column
 table["all_dimensions"] = ""
 for col in [x for x in list(table.columns.values) if x not in ["Value", "all_dimensions", "source"]]:
@@ -155,9 +157,8 @@ for col in [x for x in list(table.columns.values) if x not in ["Value", "all_dim
 vc = table["all_dimensions"].value_counts()
 duplicated_combinations = [k for (k, v) in vc.items() if v >1]
 
-# it's a precision difference, so we're going to:
-# a) confirm the early digits
-# b) take the most precise number, drop the other
+# it's a precision difference, so we're going to take the most precise number, drop the other
+# we'll use rounding to choose, as if one rounded != the other, we'll need to know anyway
 for combination in duplicated_combinations:
     
     temp_df = table.copy()
@@ -168,22 +169,38 @@ for combination in duplicated_combinations:
                         "is not appearing exactly twice....something unexpected has occurred. For "
                          "dimension combination {}.".format(combination))
     
-    # Compare precision of the last two digits    
+    # Compare precision  
     both_values = list(temp_df["Value"].unique())
     
-    # We're rounding to 1, 3 or 3 dignificant bits
+    # We're rounding to 1, 3 or 3 significant bits
     found = False
     for i in range(1, 3):
-        if float(round(both_values[0], -i)) == float(both_values[1]):
+        if round(both_values[0], -i) == both_values[1]:
             chosen_value = both_values[0]
             found = True
             break
-            
-        if float(round(both_values[1], -i)) == float(both_values[0]):
+         
+        if round(both_values[1], -i) == both_values[0]:
             chosen_value = both_values[1]
             found = True
             break
             
+    if not found:
+        
+        # NOTE - python 3 rounds down on breakpoints (i.e on 5) but humans traditionally go up. 
+        # We need to account for that so in the event of a miss we'll "nudge" trailing 5's 
+        # to 6's and try again
+        lower_value = min(both_values)
+        higher_value = max(both_values)
+        
+        lower_value = int(str(lower_value)[:-2] + str(lower_value)[-2:].replace("5", "6"))
+        for i in range(1, 3):
+            if round(lower_value, -i) == higher_value:
+                chosen_value = max(both_values)
+                found = True
+                break
+    
+    # If all efforts have failed we need to blow up
     if not found:
         raise ValueError("Aborting. We have duplicate numbers that appear to be differentiated by "
                     "more than just the significant numbers, these: {}".format(",".join([str(x) for x in both_values])))
